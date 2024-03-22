@@ -1,0 +1,4 @@
+name: HodChat
+version: '${project.version}'
+main: net.deoconst.hodchat.HodChat
+api-version: '1.20'
