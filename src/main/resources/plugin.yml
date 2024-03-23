@@ -2,3 +2,7 @@ name: HodChat
 version: '${project.version}'
 main: net.deoconst.hodchat.HodChat
 api-version: '1.20'
+commands:
+  hodchat:
+    usage: /<command> <subCommand> <player> <color1> <color2>
+
