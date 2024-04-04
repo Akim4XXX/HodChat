@@ -1,8 +1,58 @@
-name: HodChat
+name: "HodChat"
 version: '${project.version}'
-main: net.deoconst.hodchat.HodChat
+main: net.deoconst.hodchat.HodChatPlugin
 api-version: '1.20'
+# Resours pack https://www.dropbox.com/scl/fi/twbjet0cl840r2dasqhxh/HodChatRP.zip?rlkey=70v26gw9rribsp5wv8g8megs6&dl=1
 commands:
-  hodchat:
+  nick:
     usage: /<command> <subCommand> <player> <color1> <color2>
+    permission: hodchat.nick
+  global:
+    usage: /global
+    aliases:
+      - g
+  local:
+    usage: /local
+    aliases:
+      - l
+  JQAlert:
+    usage: /JQAlert on/off
+    aliases:
+      - jqa
+  test:
+    usage: /<command>
 
+group:
+  
+
+
+permissions:
+  # Nick command permissions
+  hodchat.nick:
+    description: "Allows players to use the /nick command."
+    default: true
+    children:
+      hodchat.setGradient: true
+      hodchat.setGradientOther: false
+      hodchat.setColor: true
+      hodchat.setColorOther: false
+      hodchat.setPrefix: true
+      hodchat.setPrefixOther: false
+      hodchat.clear: true
+      hodchat.clearOther: false
+  hodchat.setGradientOther:
+    description: "Allows players to set gradients for other players."
+    default: op
+  hodchat.setColorOther:
+    description: "Allows players to set color for other players."
+    default: op
+  hodchat.clearOther:
+    description: "Removes the colour of the player's nickname. "
+    default: op
+  #Chat permissions
+  hodchat.local:
+    description: "Allows players to switch chat mode to global mode."
+    default: true
+  hodchat.global:
+    description: "Allows players to switch chat mode to global mode."
+    default: true
