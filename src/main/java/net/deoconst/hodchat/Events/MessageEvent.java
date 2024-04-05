@@ -1,6 +1,7 @@
 package net.deoconst.hodchat.Events;
 
 import net.deoconst.hodchat.HodChatPlugin;
+import net.deoconst.hodchat.util.MessagesManager;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,19 +17,16 @@ public class MessageEvent implements Listener {
         Player player = event.getPlayer();
         if(Objects.equals(player.getMetadata("chatType").get(0).asString(), "local")){
             event.setCancelled(true);
-            sendLocalMessage(player, message);
+            String lMessage = HodChatPlugin.config().LOCALCHAT_FROMAT.replace("{message}", message);
+            sendLocalMessage(player, lMessage);
         }
         if(HodChatPlugin.config().CHAT_FORMATTER){
-            event.setFormat(HodChatPlugin.config().CHAT_FORMAT
-                    .replace("{displayName}", event.getPlayer().getDisplayName() + ChatColor.RESET)
-                    .replace("{message}", message)
-            );
+            String gMessage = HodChatPlugin.config().CHAT_FORMAT.replace("{message}", message);
+            event.setFormat(MessagesManager.chatMessages(gMessage, player));
         }
     }
     public void sendLocalMessage(Player eventPlayer, String message){
-        String localMessage = HodChatPlugin.config().LOCALCHAT_FROMAT
-                .replace("{displayName}", eventPlayer.getDisplayName() + ChatColor.RESET)
-                .replace("{message}", message);
+        String localMessage = MessagesManager.chatMessages(message, eventPlayer);
         boolean playerHeard = false;
         for (Player player : HodChatPlugin.core().getServer().getOnlinePlayers()) {
             if(!player.equals(eventPlayer)){

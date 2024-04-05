@@ -24,7 +24,6 @@ public class GlobalLocalCommand implements CommandExecutor {
             }
             player.setMetadata("chatType", new FixedMetadataValue(HodChatPlugin.core(), "global"));
             player.sendMessage("Вы переключены на " + ChatColor.GREEN + "глобальный чат");
-            player.sendMessage(player.getMetadata("chatType").get(0).asString());
         } else if (command.getName().equalsIgnoreCase("local")) {
             if(!sender.hasPermission("hodchat.global")){
                 sender.sendMessage(ChatColor.RED + "У вас нет прав!");

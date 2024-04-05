@@ -1,5 +1,6 @@
 package net.deoconst.hodchat.util;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.deoconst.hodchat.Config.JsonStorage;
 import net.deoconst.hodchat.HodChatPlugin;
 import net.kyori.adventure.text.Component;
@@ -26,17 +27,14 @@ public class ColorsManager {
         if(!isBold) coloredName = coloredName.replace("<bold>", "");
         if(!isUnderlined) coloredName = coloredName.replace("<underlined>", "");
         coloredName = coloredName.replace("{displayName}", player.getName());
-        player.sendMessage(coloredName);
         @NotNull Component mmdisplayName = MiniMessage.miniMessage().deserialize(coloredName);
         String displayName = LegacyComponentSerializer
                 .builder().useUnusualXRepeatedCharacterHexFormat()
                 .hexColors().build()
                 .serialize(mmdisplayName);
         player.setDisplayName(displayName);
-        if(HodChatPlugin.config().TAB_NICKS){
-            player.setPlayerListName(displayName);
-        }
-        player.sendMessage(displayName);
+        player.setPlayerListName(PlaceholderAPI.setPlaceholders(player, HodChatPlugin.config().TAB_LIST_FORMAT));
+
         JsonStorage.saveNick(player, displayName, isBold, isUnderlined, hexColors);
     }
 

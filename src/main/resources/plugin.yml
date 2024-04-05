@@ -2,6 +2,7 @@ name: "HodChat"
 version: '${project.version}'
 main: net.deoconst.hodchat.HodChatPlugin
 api-version: '1.20'
+softdepend: [PlaceholderAPI]
 # Resours pack https://www.dropbox.com/scl/fi/twbjet0cl840r2dasqhxh/HodChatRP.zip?rlkey=70v26gw9rribsp5wv8g8megs6&dl=1
 commands:
   nick:
@@ -19,12 +20,6 @@ commands:
     usage: /JQAlert on/off
     aliases:
       - jqa
-  test:
-    usage: /<command>
-
-group:
-  
-
 
 permissions:
   # Nick command permissions

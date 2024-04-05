@@ -8,7 +8,6 @@ import org.bukkit.entity.*;
 import org.bukkit.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -86,30 +85,41 @@ public class NickCommand implements CommandExecutor
         return true;
     }
     // /hodchat setGradient <name> <deco> <color1> <color2> .. ..
-    private void setGradient(final CommandSender sender, final String[] args){
-        @NotNull final String argsPlayerName = args[1];
-        @NotNull final Player targetPlayer = Objects.requireNonNull(HodChatPlugin.core().getServer().getPlayer(argsPlayerName));
+    private void setGradient(final CommandSender sender, final String[] args) {
+        if (args.length < 4 || args.length > 8) {
+            sender.sendMessage(ChatColor.RED + "Использование: /nick setGradient <player> decorations [bold] [underlined] #colors2..4");
+            return;
+        }
+
+        final String playerName = args[1];
+        final Player targetPlayer = HodChatPlugin.core().getServer().getPlayer(playerName);
+
+        if (targetPlayer == null) {
+            sender.sendMessage(ChatColor.RED + "Игрок " + playerName + " не найден!");
+            return;
+        }
 
         int startColor = 2;
         boolean isBold = false;
         boolean isUnderlined = false;
 
-        if(args.length == 2) sender.sendMessage("/nick setGradient player #colors2..4");
-        if (args.length > 4 && args.length <= 8) {
-            for (int i = 2; i < args.length; i++) {
-                if (args[i].equalsIgnoreCase("bold")) isBold = true;
-                else if (args[i].equalsIgnoreCase("underlined")) isUnderlined = true;
+        for (int i = 2; i < args.length; i++) {
+            if (args[i].equalsIgnoreCase("bold")) {
+                isBold = true;
+                startColor++;
+            } else if (args[i].equalsIgnoreCase("underlined")) {
+                isUnderlined = true;
+                startColor++;
             }
-            if (isBold || isUnderlined) startColor = 3;
-            if(isBold && isUnderlined) startColor = 4;
-        } else return;
+        }
 
         final String[] colors = new String[args.length - startColor];
         System.arraycopy(args, startColor, colors, 0, args.length - startColor);
-        if(!isValidHexColor(colors, startColor)){
+        if (isValidHexColor(colors, startColor - 1)) {
             sender.sendMessage(ChatColor.RED + "Неверный формат цвета! Пожалуйста, используйте формат HEX для указания цветов.");
             return;
         }
+
         if (colors.length < 2 || colors.length > 4) {
             sender.sendMessage(ChatColor.RED + "Неверное количество цветов! Допустимо от 2 до 4 цветов.");
             return;
@@ -119,31 +129,47 @@ public class NickCommand implements CommandExecutor
         targetPlayer.sendMessage("Новый цвет ника успешно установлен - " + targetPlayer.getDisplayName());
     }
     // /nick setColor <playerName> <deco> <color>
-    private void setColor(final CommandSender sender, final String[] args){
-        @NotNull final String argsPlayerName = args[1];
-        @NotNull final Player targetPlayer = Objects.requireNonNull(HodChatPlugin.core().getServer().getPlayer(argsPlayerName));
+    private void setColor(final CommandSender sender, final String[] args) {
+        if (args.length < 3 || args.length > 6) {
+            sender.sendMessage(ChatColor.RED + "Использование: /nick setColor <player> [bold] [underlined] <color>");
+            return;
+        }
 
-        int startColor = 2;
+        final String playerName = args[1];
+        final Player targetPlayer = HodChatPlugin.core().getServer().getPlayer(playerName);
+
+        if (targetPlayer == null) {
+            sender.sendMessage(ChatColor.RED + "Игрок " + playerName + " не найден!");
+            return;
+        }
+
         boolean isBold = false;
         boolean isUnderlined = false;
+        int startColor = 2;
+        String color;
 
-        if(args.length == 2) sender.sendMessage("/nick setColor player Bold/Underlined #color");
-        if (args.length > 2 && args.length <= 5) {
-            for (int i = 2; i < args.length; i++) {
-                if (args[i].equalsIgnoreCase("bold")) isBold = true;
-                else if (args[i].equalsIgnoreCase("underlined")) isUnderlined = true;
+        for (int i = 2; i < args.length; i++) {
+            if (args[i].equalsIgnoreCase("bold")) {
+                isBold = true;
+            } else if (args[i].equalsIgnoreCase("underlined")) {
+                isUnderlined = true;
+            } else {
+                startColor = i;
+                break;
             }
-            if (isBold || isUnderlined) startColor = 3;
-            if(isBold && isUnderlined) startColor = 4;
-        } else return;
+        }
+
+        color = args[startColor];
+        startColor++; // Сдвигаем индекс начала цветов на следующий аргумент после цвета
 
         final String[] colors = new String[args.length - startColor];
         System.arraycopy(args, startColor, colors, 0, args.length - startColor);
-        if(!isValidHexColor(colors, startColor)){
+        if (color == null || isValidHexColor(colors, startColor - 1)) {
             sender.sendMessage(ChatColor.RED + "Неверный формат цвета! Пожалуйста, используйте формат HEX для указания цветов.");
             return;
         }
-        ColorsManager.generateColoredNick(targetPlayer, isBold, isUnderlined, "color", colors);
+
+        ColorsManager.generateColoredNick(targetPlayer, isBold, isUnderlined, color, colors);
         targetPlayer.sendMessage("Новый цвет ника успешно установлен - " + targetPlayer.getDisplayName());
     }
     private void clear(final CommandSender sender, final String[] args){
@@ -174,15 +200,9 @@ public class NickCommand implements CommandExecutor
             // Создание объекта Matcher для текущей строки
             Matcher matcher = pattern.matcher(args[i]);
             if (!matcher.matches()) {
-                return false; // Если строка не соответствует формату HEX-кода, возвращаем false
+                return true; // Если строка не соответствует формату HEX-кода, возвращаем false
             }
         }
-        return true; // Если все строки соответствуют формату HEX-кода, возвращаем true
-    }
-    public static boolean isValidHexColor(String args) {
-        String hexPattern = "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$";
-        Pattern pattern = Pattern.compile(hexPattern);
-        Matcher matcher = pattern.matcher(args);
-        return matcher.matches(); // Если строка не соответствует формату HEX-кода, возвращаем false
+        return false; // Если все строки соответствуют формату HEX-кода, возвращаем true
     }
 }

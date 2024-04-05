@@ -3,7 +3,9 @@ package net.deoconst.hodchat.Config;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.deoconst.hodchat.HodChatPlugin;
+import net.kyori.adventure.Adventure;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -23,21 +25,15 @@ public class StorageMethods {
             player.setMetadata("JQAlert", new FixedMetadataValue(HodChatPlugin.core(), "on"));
             if(ifPlayerInJson(player)){
                 player.setDisplayName(JsonStorage.getNick(player));
-                if(HodChatPlugin.config().TAB_NICKS){
-                    Objects.requireNonNull(player.getPlayer()).setPlayerListName(JsonStorage.getNick(player));
-                }
             } else {
                 if(HodChatPlugin.config().USE_DEFAULT_NICK_COLOR){
                     player.setDisplayName(setNick(player));
-                    if(HodChatPlugin.config().TAB_NICKS){
-                        player.setPlayerListName(setNick(player));
-                    }
                 }
                 else{
                     player.setDisplayName(player.getName());
-                    player.setPlayerListName(player.getName());
                 }
             }
+            player.setPlayerListName(PlaceholderAPI.setPlaceholders(player, HodChatPlugin.config().TAB_LIST_FORMAT));
         }
     }
     public static void updatePlayer(Player player){
@@ -45,21 +41,15 @@ public class StorageMethods {
         player.setMetadata("JQAlert", new FixedMetadataValue(HodChatPlugin.core(), "on"));
         if(ifPlayerInJson(player)){
             player.setDisplayName(JsonStorage.getNick(player));
-            if(HodChatPlugin.config().TAB_NICKS){
-                Objects.requireNonNull(player.getPlayer()).setPlayerListName(JsonStorage.getNick(player));
-            }
         } else {
             if(HodChatPlugin.config().USE_DEFAULT_NICK_COLOR){
                 player.setDisplayName(setNick(player));
-                if(HodChatPlugin.config().TAB_NICKS){
-                    player.setPlayerListName(setNick(player));
-                }
             }
             else{
                 player.setDisplayName(player.getName());
-                player.setPlayerListName(player.getName());
             }
         }
+        player.setPlayerListName(PlaceholderAPI.setPlaceholders(player, HodChatPlugin.config().TAB_LIST_FORMAT));
     }
     public static String setNick(@NotNull Player player){
         String toSerialize = ("<color:" + HodChatPlugin.config().DEFAULT_NICK_COLOR + ">" + player.getName() + "</color>");

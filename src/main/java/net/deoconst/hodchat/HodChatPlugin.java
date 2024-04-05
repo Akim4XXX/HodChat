@@ -38,8 +38,12 @@ public final class HodChatPlugin extends JavaPlugin {
         configFile = new File(this.getDataFolder(), "config.yml");
         config = new ConfigValues();
     }
-    @Override
+    @Override()
     public void onEnable() {
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null) {
+            getLogger().warning("Could not find PlaceholderAPI! This plugin is required.");
+            Bukkit.getPluginManager().disablePlugin(this);
+        } else StorageMethods.updatePlayers(Bukkit.getOnlinePlayers());
         boolean JSONCreated = getJsonFile().exists();
         boolean YMLCreated = getConfigFile().exists();
 
